@@ -19,10 +19,11 @@ interface Props<T extends { id?: number }> {
   colunas: Col<T>[];
   valorInicial: T;
   form: (estado: T, set: (t: T) => void) => ReactNode;
+  validar?: (item: T) => string | null;
 }
 
 export function TabelaCRUD<T extends { id?: number }>({
-  titulo, recurso, colunas, valorInicial, form,
+  titulo, recurso, colunas, valorInicial, form, validar,
 }: Props<T>) {
   const [itens, setItens] = useState<T[]>([]);
   const [editando, setEditando] = useState<T>(valorInicial);
@@ -38,6 +39,9 @@ export function TabelaCRUD<T extends { id?: number }>({
   const novo = () => setEditando(valorInicial);
 
   const salvar = async () => {
+    setErro("");
+    const msg = validar?.(editando);
+    if (msg) { setErro(msg); return; }
     try {
       if (editando.id) await api.atualizar(recurso, editando.id, editando);
       else              await api.inserir(recurso, editando);
