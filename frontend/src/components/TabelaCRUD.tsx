@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { api } from "../api.ts";
 
-// CORACAO DA COMPACTACAO POR REUSO (Q03).
+//COMPACTACAO POR REUSO (Q03).
 // Toda pagina CRUD usa este componente. Botoes, tabela, selecao e
 // salvar/excluir moram aqui UMA UNICA VEZ. As paginas so dizem:
 //   - recurso da API (ex.: "produtos")
