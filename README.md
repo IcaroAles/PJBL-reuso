@@ -1,6 +1,9 @@
 # PJBL Reuso - Sistema de Estoque
+# !!!VIDEO SOLICITADO SOBRE COMPACTAÇÃO ESTA NO REPO E SE CHAMA COMPACTVID.MP4!!!
 
 Trabalho de reuso de software. Backend em Node + TypeScript, frontend em React, banco PostgreSQL.
+
+
 
 ## Requisitos
 
