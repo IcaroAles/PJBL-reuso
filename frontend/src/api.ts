@@ -6,7 +6,11 @@ async function req<T>(url: string, opts?: RequestInit): Promise<T> {
     headers: { "Content-Type": "application/json" },
     ...opts,
   });
-  if (!r.ok) throw new Error(await r.text());
+  if (!r.ok) {
+    const txt = await r.text();
+    try { throw new Error(JSON.parse(txt).erro ?? txt); }
+    catch (e: any) { throw new Error(e?.message ?? txt); }
+  }
   return r.status === 204 ? (undefined as T) : r.json();
 }
 

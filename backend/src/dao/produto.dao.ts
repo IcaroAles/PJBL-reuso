@@ -5,12 +5,18 @@ import type { Produto } from "../models/index.ts";
 const s = (v: any) => v == null ? "NULL" : `'${v}'`;
 const n = (v: any) => v == null ? "NULL" : String(v);
 
+function validar(p: Produto) {
+  if (!p.nome || !String(p.nome).trim()) throw new Error("Nome e obrigatorio.");
+  if (!p.sku  || !String(p.sku).trim())  throw new Error("SKU e obrigatorio.");
+}
+
 export const ProdutoDAO = {
   async listar(): Promise<Produto[]> {
     const r = await db.query<Produto>(`SELECT * FROM produto ORDER BY nome`);
     return r.rows;
   },
   async inserir(p: Produto): Promise<Produto> {
+    validar(p);
     const r = await db.query<Produto>(
       `INSERT INTO produto
        (nome, sku, tipo, preco_custo, preco_venda, quantidade, estoque_minimo,
@@ -25,6 +31,7 @@ export const ProdutoDAO = {
     return r.rows[0];
   },
   async atualizar(id: number, p: Produto): Promise<Produto> {
+    validar(p);
     const r = await db.query<Produto>(
       `UPDATE produto SET
          nome=${s(p.nome)},

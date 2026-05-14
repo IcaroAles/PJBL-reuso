@@ -27,6 +27,11 @@ export default function Produtos() {
       titulo="Produtos"
       recurso="produtos"
       valorInicial={inicial}
+      validar={p => {
+        if (!p.nome.trim()) return "Informe o nome do produto.";
+        if (!p.sku.trim())  return "Informe o SKU do produto.";
+        return null;
+      }}
       colunas={[
         { titulo: "ID",         campo: p => p.id },
         { titulo: "SKU",        campo: p => p.sku },
@@ -38,10 +43,10 @@ export default function Produtos() {
       ]}
       form={(p, set) => (
         <>
-          <div><label>Nome</label>
-            <input value={p.nome} onChange={e => set({ ...p, nome: e.target.value })} /></div>
-          <div><label>SKU</label>
-            <input value={p.sku} onChange={e => set({ ...p, sku: e.target.value })} /></div>
+          <div><label>Nome *</label>
+            <input required value={p.nome} onChange={e => set({ ...p, nome: e.target.value })} /></div>
+          <div><label>SKU *</label>
+            <input required value={p.sku} onChange={e => set({ ...p, sku: e.target.value })} /></div>
           <div><label>Categoria</label>
             <select value={p.categoria_id ?? ""}
                     onChange={e => set({ ...p, categoria_id: e.target.value ? Number(e.target.value) : null })}>
