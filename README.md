@@ -43,3 +43,18 @@ npm run dev
 ## Trocando a edicao (LPS)
 
 Edita `backend/.env`, troca `EDITION=PLUS` por `BASIC` ou `ENTERPRISE`, reinicia o backend e atualiza o navegador. O menu muda conforme a edicao ativa.
+
+## ORM e Database First
+
+O projeto tambem expoe as entidades via ORM **Prisma**, lado a lado com o acesso `pg` cru: `/api/*` usa SQL cru, `/api/orm/*` usa o ORM. As classes do Prisma sao geradas a partir do banco existente (Database First):
+
+```
+docker compose up -d        # sobe o Postgres e roda o schema
+cd backend && npm install
+npx prisma db pull          # introspecta o banco -> prisma/schema.prisma
+npx prisma generate         # gera as classes tipadas (Prisma Client)
+npx prisma studio           # telas CRUD auto-geradas (http://localhost:5555)
+npm run dev
+```
+
+Guia completo da entrega em `entrega/ENTREGA-ORM.md`; trabalho escrito (Database First vs ORM) em `entrega/TRABALHO-ESCRITO.md`.

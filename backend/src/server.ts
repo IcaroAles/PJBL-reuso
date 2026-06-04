@@ -10,6 +10,8 @@ import { MovimentacaoDAO } from "./dao/movimentacao.dao.ts";
 import {
   RelatorioEstoqueBaixo, RelatorioInventario, RelatorioMovimentacao,
 } from "./patterns/template/relatorio.ts";
+import { prisma } from "./orm/prisma.ts";
+import { rotasORM, rotasORMRelacionais } from "./orm/routesORM.ts";
 
 const app = express();
 app.use(cors());
@@ -21,6 +23,23 @@ app.use("/api/categorias",    rotasCRUD(CategoriaDAO as any));
 app.use("/api/fornecedores",  rotasCRUD(FornecedorDAO as any));
 app.use("/api/produtos",      rotasCRUD(ProdutoDAO as any));
 app.use("/api/movimentacoes", rotasCRUD(MovimentacaoDAO as any));
+
+// =============================================================================
+// ORM (Prisma) - mesmas entidades expostas LADO A LADO em /api/orm/*.
+// Enquanto /api/* usa pg cru (DAOs), /api/orm/* usa o ORM Prisma.
+// 9 models = 9 "classes ORM" (>= 2 por integrante da equipe).
+// =============================================================================
+app.use("/api/orm/usuarios",            rotasORM(prisma.usuario as any));
+app.use("/api/orm/categorias",          rotasORM(prisma.categoria as any));
+app.use("/api/orm/fornecedores",        rotasORM(prisma.fornecedor as any));
+app.use("/api/orm/produtos",            rotasORM(prisma.produto as any));
+app.use("/api/orm/movimentacoes",       rotasORM(prisma.movimentacao as any));
+app.use("/api/orm/produtos-pereciveis", rotasORM(prisma.produto_perecivel as any));
+app.use("/api/orm/produtos-eletronicos",rotasORM(prisma.produto_eletronico as any));
+app.use("/api/orm/pedidos",             rotasORM(prisma.pedido as any));
+app.use("/api/orm/pedido-itens",        rotasORM(prisma.pedido_item as any));
+// Endpoints relacionais (include) que mostram o ganho do ORM.
+app.use("/api/orm", rotasORMRelacionais());
 
 // LPS: o frontend consulta este endpoint para saber qual edicao esta ativa.
 app.get("/api/config", (_req, res) => {

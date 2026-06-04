@@ -1,5 +1,7 @@
--- 5 tabelas: usuario, categoria, fornecedor, produto, movimentacao
-DROP TABLE IF EXISTS movimentacao, produto, categoria, fornecedor, usuario CASCADE;
+-- 9 tabelas: usuario, categoria, fornecedor, produto, movimentacao,
+-- produto_perecivel, produto_eletronico, pedido, pedido_item
+DROP TABLE IF EXISTS pedido_item, pedido, produto_eletronico, produto_perecivel,
+                     movimentacao, produto, categoria, fornecedor, usuario CASCADE;
 
 CREATE TABLE usuario (
     id     SERIAL PRIMARY KEY,
@@ -44,6 +46,41 @@ CREATE TABLE movimentacao (
     data_mov   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Especializacao de produto: detalhes so de itens pereciveis (1-para-1 com produto).
+CREATE TABLE produto_perecivel (
+    id               SERIAL PRIMARY KEY,
+    produto_id       INT NOT NULL UNIQUE REFERENCES produto(id) ON DELETE CASCADE,
+    lote             VARCHAR(40)  NOT NULL,
+    validade         DATE         NOT NULL,
+    temperatura_ideal NUMERIC(5,2)
+);
+
+-- Especializacao de produto: detalhes so de itens eletronicos (1-para-1 com produto).
+CREATE TABLE produto_eletronico (
+    id             SERIAL PRIMARY KEY,
+    produto_id     INT NOT NULL UNIQUE REFERENCES produto(id) ON DELETE CASCADE,
+    voltagem       VARCHAR(10),
+    garantia_meses INT          DEFAULT 12,
+    fabricante     VARCHAR(80)
+);
+
+-- Pedido de compra feito a um fornecedor.
+CREATE TABLE pedido (
+    id            SERIAL PRIMARY KEY,
+    fornecedor_id INT NOT NULL REFERENCES fornecedor(id) ON DELETE RESTRICT,
+    data_pedido   TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
+    status        VARCHAR(20) NOT NULL DEFAULT 'ABERTO'   -- ABERTO / RECEBIDO / CANCELADO
+);
+
+-- Itens de um pedido (N produtos por pedido).
+CREATE TABLE pedido_item (
+    id             SERIAL PRIMARY KEY,
+    pedido_id      INT NOT NULL REFERENCES pedido(id) ON DELETE CASCADE,
+    produto_id     INT NOT NULL REFERENCES produto(id) ON DELETE RESTRICT,
+    quantidade     INT           NOT NULL CHECK (quantidade > 0),
+    preco_unitario NUMERIC(12,2) NOT NULL DEFAULT 0
+);
+
 -- dados de teste
 INSERT INTO usuario (nome, email, senha, perfil) VALUES
  ('Admin', 'admin@x.com', '123', 'ADMIN');
@@ -58,3 +95,18 @@ INSERT INTO produto (nome, sku, tipo, preco_custo, preco_venda, quantidade, esto
  ('Arroz 5kg', 'ARR-5KG', 'PERECIVEL', 18, 28, 50, 10, 1, 1),
  ('Sabao 1kg', 'SAB-1KG', 'COMUM',      8, 14, 30,  5, 2, 1),
  ('Mouse USB', 'MOU-USB', 'ELETRONICO',25, 49, 15,  3, 3, 2);
+
+INSERT INTO produto_perecivel (produto_id, lote, validade, temperatura_ideal) VALUES
+ (1, 'LT-2026-001', '2026-12-31', 22.0);
+
+INSERT INTO produto_eletronico (produto_id, voltagem, garantia_meses, fabricante) VALUES
+ (3, 'USB-5V', 12, 'GenericTech');
+
+INSERT INTO pedido (fornecedor_id, status) VALUES
+ (1, 'RECEBIDO'),
+ (2, 'ABERTO');
+
+INSERT INTO pedido_item (pedido_id, produto_id, quantidade, preco_unitario) VALUES
+ (1, 1, 100, 18.00),
+ (1, 2,  50,  8.00),
+ (2, 3,  20, 25.00);
